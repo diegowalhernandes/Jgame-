@@ -1,1 +1,118 @@
 
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Toque</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        #game-container {
+            position: relative;
+            width: 90vw;
+            height: 70vh;
+            background-color: white;
+            border: 2px solid black;
+            overflow: hidden;
+        }
+        .circle {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+        #score {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        #start-btn {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Jogo do Toque</h1>
+    <div id="game-container"></div>
+    <p id="score">Pontuação: 0</p>
+    <button id="start-btn">Iniciar Jogo</button>
+
+    <script>
+        const gameContainer = document.getElementById("game-container");
+        const scoreDisplay = document.getElementById("score");
+        const startButton = document.getElementById("start-btn");
+
+        let score = 0;
+        let gameInterval;
+        let timeToClick = 2000; // Tempo para clicar (ms)
+
+        function startGame() {
+            score = 0;
+            scoreDisplay.textContent = "Pontuação: " + score;
+            startButton.disabled = true;
+            gameContainer.innerHTML = "";
+            gameLoop();
+        }
+
+        function gameLoop() {
+            gameInterval = setTimeout(() => {
+                spawnCircle();
+                gameLoop();
+            }, 1000);
+        }
+
+        function spawnCircle() {
+            const circle = document.createElement("div");
+            circle.classList.add("circle");
+
+            const maxX = gameContainer.clientWidth - 50;
+            const maxY = gameContainer.clientHeight - 50;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            circle.style.left = `${randomX}px`;
+            circle.style.top = `${randomY}px`;
+
+            gameContainer.appendChild(circle);
+
+            let timeout = setTimeout(() => {
+                if (gameContainer.contains(circle)) {
+                    gameContainer.removeChild(circle);
+                    endGame();
+                }
+            }, timeToClick);
+
+            circle.addEventListener("click", () => {
+                clearTimeout(timeout);
+                score++;
+                scoreDisplay.textContent = "Pontuação: " + score;
+                gameContainer.removeChild(circle);
+            });
+        }
+
+        function endGame() {
+            clearTimeout(gameInterval);
+            alert("Fim de jogo! Sua pontuação: " + score);
+            startButton.disabled = false;
+        }
+
+        startButton.addEventListener("click", startGame);
+    </script>
+
+</body>
+</html>
